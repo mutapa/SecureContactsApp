@@ -1,8 +1,6 @@
-import React, {Component} from 'react'
-import {View, Text, TextInput, StyleSheet, Button} from 'react-native'
-import {Constants} from 'expo'
-import PropTypes from 'prop-types'
-import { black } from 'ansi-colors';
+import React, {Component} from 'react';
+import {View, Text, StyleSheet, Button, AsyncStorage} from 'react-native';
+import PropTypes from 'prop-types';
 import Expo from 'expo';
 
 export default class LoginScreen extends Component{
@@ -11,14 +9,17 @@ export default class LoginScreen extends Component{
     }
     constructor(props) {
         super(props)
-        this.state = {
-            isLoginSuccessful: false,
-            name: '',
-            photoUrl: '',
-            accessToken: '',
-        }
     }
  
+    componentWillMount() {
+        const token = AsyncStorage.getItem('token');
+        console.log('Token: ' + token);
+        if(token){
+            this.props.navigation.navigate({routeName: 'Main'});           
+        }
+    }
+    
+
     attemptLogin = async () => {
         console.log('Calling the attempt login method')
         try {
@@ -30,22 +31,19 @@ export default class LoginScreen extends Component{
 
            if(result.type === 'success'){
             console.log('Routing to Main navigator');
-            this.setState({
-                isLoginSuccessful: true,
-                name: result.user.name,
-                photoUrl: result.user.photoUrl,
-                accessToken: result.accessToken,
-            });
+            await AsyncStorage.setItem('name', result.user.email);
+            await AsyncStorage.setItem('photoUrl', result.user.photoUrl);
+            await AsyncStorage.setItem('token', result.accessToken);
+            
             this.props.navigation.navigate({routeName: 'Main'});
+           }
+           else {
+               console.log('Google Authentication cancelled');
            }
         }
         catch(e){
             console.log('error', e)
-        }
-        
-        
-        
-        
+        }  
     }
 
     render() {
