@@ -2,11 +2,26 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
+import contacts from './datalayer/contacts';
+import {fetchUsers} from './datalayer/api'; 
+import {store, persistor} from './redux/store';
+import {Provider} from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
+    contacts,
   };
+
+  componentDidMount() {
+    this.getUsers();
+  }
+
+  getUsers = async() => {
+    const fetchedUsers = await fetchUsers();
+    this.setState({contacts: fetchedUsers});   
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -19,10 +34,14 @@ export default class App extends React.Component {
       );
     } else {
       return (
-        <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <AppNavigator />
-        </View>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <View style={styles.container}>
+              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+              <AppNavigator />
+            </View>
+          </PersistGate>
+        </Provider>
       );
     }
   }

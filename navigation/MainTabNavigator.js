@@ -4,7 +4,7 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import ContactsScreen from '../screens/ContactsScreen'
+import ContactListScreen from '../screens/ContactListScreen'
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
@@ -28,7 +28,12 @@ HomeStack.navigationOptions = {
 };
 
 const ContactsStack = createStackNavigator({
-  Contacts: ContactsScreen,
+  Contacts: ContactListScreen,
+  ContactDetails, ContactDetailsScreen,
+  AddContact, AddContactScreen,
+},
+{
+  initialRouteName: 'Contacts'
 });
 
 ContactsStack.navigationOptions = {
